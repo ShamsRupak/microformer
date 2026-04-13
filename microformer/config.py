@@ -34,6 +34,9 @@ class ModelConfig:
     dropout: float = 0.1
     rope_theta: float = 10_000.0
 
+    # GQA: number of key/value heads.  0 → same as n_heads (standard MHA).
+    n_kv_heads: int = 0
+
     # Derived — set automatically in __post_init__.
     d_head: int = 0
 
@@ -45,6 +48,15 @@ class ModelConfig:
             )
         # Frozen dataclass requires object.__setattr__ for derived fields.
         object.__setattr__(self, "d_head", self.d_model // self.n_heads)
+
+        # Resolve n_kv_heads: 0 means "same as n_heads" (standard MHA).
+        effective_kv = self.n_kv_heads if self.n_kv_heads > 0 else self.n_heads
+        object.__setattr__(self, "n_kv_heads", effective_kv)
+        if self.n_heads % self.n_kv_heads != 0:
+            raise ValueError(
+                f"n_heads ({self.n_heads}) must be divisible by "
+                f"n_kv_heads ({self.n_kv_heads})"
+            )
 
     @classmethod
     def from_name(cls, name: str) -> ModelConfig:
