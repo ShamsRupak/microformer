@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "microformer"
+version = "0.1.0"
+description = "A GPT-style transformer implemented from scratch in PyTorch"
+requires-python = ">=3.11"
+dependencies = [
+    "torch>=2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "ruff>=0.4",
+    "black>=24.0",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+ignore = [
+    "N806",  # Uppercase variable names (B, T, C, H, D) — standard in ML.
+    "N812",  # Lowercase imported as non-lowercase (torch.nn.functional as F).
+]
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
